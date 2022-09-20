@@ -25,9 +25,9 @@ public class PessoaDAO {
 //    }
 //
 //    static {
-//        listaPessoas.add(new Autor("KenzoAutor", "Sato", "ka@", "123", Genero.MASCULINO, "123"));
-//        listaPessoas.add(new Revisor("KenzoRevisor", "Sato", "kr@", "123", Genero.MASCULINO, "123"));
-//        listaPessoas.add(new Diretor("KenzoDiretor", "Sato", "kd@", "123", Genero.MASCULINO, "123"));
+//        listaPessoas.add(new Autor("mthAutor", "mth", "mth@", "123", Genero.MASCULINO, "123"));
+//        listaPessoas.add(new Revisor("mthAutor", "mth", "mt@", "123", Genero.MASCULINO, "123"));
+//        listaPessoas.add(new Diretor("mthAutor", "mth", "mh@", "123", Genero.MASCULINO, "123"));
 //    }
 
     public void inserir(Pessoa pessoa) throws SQLException {

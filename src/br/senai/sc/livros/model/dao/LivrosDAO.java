@@ -9,12 +9,12 @@ public class LivrosDAO {
 //    private static Collection<Livros> listaLivros = new HashSet<>();
 //
 //    static {
-//        listaLivros.add(new Livros("KenzoLivro 1", 1, 300, new Autor("KenzoAutor 1", "Sato", "autor1@", "123", Genero.MASCULINO, "123"), Status.APROVADO));
-//        listaLivros.add(new Livros("KenzoLivro 2", 2, 350, new Autor("KenzoAutor 2", "Sato", "autor2@", "123", Genero.MASCULINO, "123"), Status.REPROVADO));
-//        listaLivros.add(new Livros("KenzoLivro 3", 3, 400, new Autor("KenzoAutor 3", "Sato", "autor3@", "123", Genero.MASCULINO, "123"), Status.AGUARDANDO_REVISAO));
-//        listaLivros.add(new Livros("KenzoLivro 4", 4, 450, new Autor("KenzoAutor 4", "Sato", "autor4@", "123", Genero.MASCULINO, "123"), Status.AGUARDADNDO_EDICAO));
-//        listaLivros.add(new Livros("KenzoLivro 5", 5, 500, new Autor("KenzoAutor 5", "Sato", "autor5@", "123", Genero.MASCULINO, "123"), Status.EM_REVISAO));
-//        listaLivros.add(new Livros("KenzoLivro 6", 6, 550, new Autor("KenzoAutor 6", "Sato", "autor6@", "123", Genero.MASCULINO, "123"), Status.PUBLICADO));
+//        listaLivros.add(new Livros("mthLivro 1", 1, 300, new Autor("mthAutor 1", "Sato", "autor1@", "123", Genero.MASCULINO, "123"), Status.APROVADO));
+//        listaLivros.add(new Livros("mthLivro 2", 2, 350, new Autor("mthAutor 2", "Sato", "autor2@", "123", Genero.MASCULINO, "123"), Status.REPROVADO));
+//        listaLivros.add(new Livros("mthLivro 3", 3, 400, new Autor("mthAutor 3", "Sato", "autor3@", "123", Genero.MASCULINO, "123"), Status.AGUARDANDO_REVISAO));
+//        listaLivros.add(new Livros("mthLivro 4", 4, 450, new Autor("mthAutor 4", "Sato", "autor4@", "123", Genero.MASCULINO, "123"), Status.AGUARDADNDO_EDICAO));
+//        listaLivros.add(new Livros("mthLivro 5", 5, 500, new Autor("mthAutor 5", "Sato", "autor5@", "123", Genero.MASCULINO, "123"), Status.EM_REVISAO));
+//        listaLivros.add(new Livros("mthLivro 6", 6, 550, new Autor("mthAutor 6", "Sato", "autor6@", "123", Genero.MASCULINO, "123"), Status.PUBLICADO));
 //    }
 //
 //    public void inserir(Livros livro) {
