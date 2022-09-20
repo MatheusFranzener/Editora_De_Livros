@@ -1,13 +1,12 @@
 package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.*;
+import br.senai.sc.livros.model.factory.ConexaoFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 public class PessoaDAO {
 //    private static Set<Pessoa> listaPessoas = new HashSet<>();
@@ -33,7 +32,7 @@ public class PessoaDAO {
     public void inserir(Pessoa pessoa) throws SQLException {
         String sql = "insert into pessoa (cpf, nome, sobrenome, email, senha, genero, funcao) values (?, ?, ?, ?, ?, ?, ?)";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -53,7 +52,7 @@ public class PessoaDAO {
     public Pessoa selecionarPorEMAIL(String email) throws SQLException {
         String sql = "select * from pessoa where email = ? limit 1";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -62,17 +61,38 @@ public class PessoaDAO {
         ResultSet resultSet = statement.executeQuery();
 
         Pessoa pessoa;
-        if (resultSet != null) {
-            if (resultSet.next()) {
-                pessoa = new Pessoa(
+        if (resultSet != null && resultSet.next()) {
+            if (resultSet.getString("funcao").equals("AUTOR")) {
+                pessoa = new Autor(
                         resultSet.getString("nome"),
                         resultSet.getString("sobrenome"),
                         resultSet.getString("email"),
                         resultSet.getString("cpf"),
                         Genero.valueOf(resultSet.getString("genero")),
                         resultSet.getString("senha")
-                ) {
-                };
+                );
+                connection.close();
+                return pessoa;
+            } else if(resultSet.getString("funcao").equals("REVISOR")) {
+                pessoa = new Revisor(
+                        resultSet.getString("nome"),
+                        resultSet.getString("sobrenome"),
+                        resultSet.getString("email"),
+                        resultSet.getString("cpf"),
+                        Genero.valueOf(resultSet.getString("genero")),
+                        resultSet.getString("senha")
+                );
+                connection.close();
+                return pessoa;
+            } else {
+                pessoa = new Diretor(
+                        resultSet.getString("nome"),
+                        resultSet.getString("sobrenome"),
+                        resultSet.getString("email"),
+                        resultSet.getString("cpf"),
+                        Genero.valueOf(resultSet.getString("genero")),
+                        resultSet.getString("senha")
+                );
                 connection.close();
                 return pessoa;
             }

@@ -9,7 +9,7 @@ import java.util.Collection;
 public class LivrosController {
     Livros model;
 
-    public void cadastrar(String titulo, Pessoa pessoa, String isbn, String qtdPaginas) {
+    public void cadastrar(String titulo, String isbn, String qtdPaginas, Pessoa pessoa) {
         Livros livro;
         livro = Livros.cadastrar(titulo, Integer.parseInt(isbn), Integer.parseInt(qtdPaginas), (Autor) pessoa);
 

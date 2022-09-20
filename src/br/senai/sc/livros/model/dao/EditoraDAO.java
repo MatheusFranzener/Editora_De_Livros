@@ -1,13 +1,13 @@
 package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.Editora;
+import br.senai.sc.livros.model.factory.ConexaoFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class EditoraDAO {
 //    private static ArrayList<Editora> listaEditoras = new ArrayList<>();
@@ -28,7 +28,7 @@ public class EditoraDAO {
         ArrayList<Editora> contatoCollection = new ArrayList<>();
         String sql = "select * from editora";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 

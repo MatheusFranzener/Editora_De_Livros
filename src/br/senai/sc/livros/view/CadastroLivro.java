@@ -37,7 +37,7 @@ public class CadastroLivro extends JFrame {
                     if (cadastrarButton.getText().equals("Cadastrar")) {
                         isbnValido = controller.validarIsbn(isbnInput.getText());
                         if (isbnValido) {
-                            controller.cadastrar(tituloInput.getText(), pessoa, isbnInput.getText(), qtdPaginasInput.getText());
+                            controller.cadastrar(tituloInput.getText(), isbnInput.getText(), qtdPaginasInput.getText(), pessoa);
                         } else {
                             JOptionPane.showMessageDialog(null, "ERRO: ISBN já cadastrado!");
                         }

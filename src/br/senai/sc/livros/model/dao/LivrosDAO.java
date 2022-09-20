@@ -1,6 +1,7 @@
 package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.*;
+import br.senai.sc.livros.model.factory.ConexaoFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -74,7 +75,7 @@ public class LivrosDAO {
     public void inserir(Livros livro) throws SQLException {
         String sql = "insert into livro (isbn, titulo, qtdPaginas, status, pessoa_cpf) values (?, ?, ?, ?, ?)";
         String cpf = livro.getAutor().getCpf();
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -84,8 +85,8 @@ public class LivrosDAO {
         statement.setInt(3, livro.getQtdPag());
         statement.setString(4, livro.getStatus().toString());
         statement.setString(5, cpf);
-        statement.execute();
 
+        statement.execute();
         connection.close();
     }
 
@@ -93,7 +94,7 @@ public class LivrosDAO {
         Collection<Livros> livrosCollection = new ArrayList<>();
         String sql = "select * from livro";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -120,7 +121,7 @@ public class LivrosDAO {
         Collection<Livros> livrosCollection = new ArrayList<>();
         String sql = "select * from livro where pessoa_cpf = ?";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -148,7 +149,7 @@ public class LivrosDAO {
         Collection<Livros> livrosCollection = new ArrayList<>();
         String sql = "select * from livro where status = ? and pessoa_cpf = ?";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -177,7 +178,7 @@ public class LivrosDAO {
         Collection<Livros> livrosCollection = new ArrayList<>();
         String sql = "select * from livro where status = ?";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -204,7 +205,7 @@ public class LivrosDAO {
     public Livros selecionar(int isbn) throws SQLException {
         String sql = "select * from livro where isbn = ?";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -237,7 +238,7 @@ public class LivrosDAO {
             sql = "update livro set isbn = ?, titulo = ?, qtdPaginas = ?, status = ?, pessoa_cpf = ?, editora_id = ? where isbn = ?";
         }
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -261,7 +262,7 @@ public class LivrosDAO {
     public Autor buscarAutorCPF(String cpf) throws SQLException {
         String sql = "select * from pessoa where cpf = ?";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
@@ -290,7 +291,7 @@ public class LivrosDAO {
     public Integer getEditoraID(String editoraNome) throws SQLException {
         String sql = "select * from editora where nome = ? limit 1";
 
-        Conexao conexao = new Conexao();
+        ConexaoFactory conexao = new ConexaoFactory();
 
         Connection connection = conexao.conectaBD();
 
