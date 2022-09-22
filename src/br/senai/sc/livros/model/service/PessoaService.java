@@ -7,18 +7,10 @@ public class PessoaService {
     PessoaDAO dao = new PessoaDAO();
 
     public void inserir(Pessoa pessoa) {
-        try {
-            dao.inserir(pessoa);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        new PessoaDAO().inserir(pessoa);
     }
 
     public Pessoa selecionarPorEMAIL(String email) {
-        try {
-            return dao.selecionarPorEMAIL(email);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+       return new PessoaDAO().selecionarPorEMAIL(email);
     }
 }

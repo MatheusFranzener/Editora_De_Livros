@@ -2,7 +2,9 @@ package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.*;
 import br.senai.sc.livros.model.factory.ConexaoFactory;
+import br.senai.sc.livros.model.factory.PessoaFactory;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,75 +31,49 @@ public class PessoaDAO {
 //        listaPessoas.add(new Diretor("mthAutor", "mth", "mh@", "123", Genero.MASCULINO, "123"));
 //    }
 
-    public void inserir(Pessoa pessoa) throws SQLException {
-        String sql = "insert into pessoa (cpf, nome, sobrenome, email, senha, genero, funcao) values (?, ?, ?, ?, ?, ?, ?)";
+    private Connection conn;
 
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, pessoa.getCpf());
-        statement.setString(2, pessoa.getNome());
-        statement.setString(3, pessoa.getSobrenome());
-        statement.setString(4, pessoa.getEmail());
-        statement.setString(5, pessoa.getSenha());
-        statement.setString(6, pessoa.getGenero().toString());
-        statement.setString(7, buscarFuncao(pessoa));
-        statement.execute();
-
-        connection.close();
+    public PessoaDAO() {
+        this.conn = new ConexaoFactory().conectaBD();
     }
 
-    public Pessoa selecionarPorEMAIL(String email) throws SQLException {
+    public void inserir(Pessoa pessoa) {
+        String sql = "insert into pessoa (cpf, nome, sobrenome, email, senha, genero, funcao) values (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            pstm.setString(1, pessoa.getCpf());
+            pstm.setString(2, pessoa.getNome());
+            pstm.setString(3, pessoa.getSobrenome());
+            pstm.setString(4, pessoa.getEmail());
+            pstm.setString(5, pessoa.getSenha());
+            pstm.setString(6, pessoa.getGenero().toString());
+            pstm.setString(7, buscarFuncao(pessoa));
+            try {
+                pstm.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (INSERT)");
+        }
+    }
+
+    public Pessoa selecionarPorEMAIL(String email){
         String sql = "select * from pessoa where email = ? limit 1";
 
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, email);
-        ResultSet resultSet = statement.executeQuery();
-
-        Pessoa pessoa;
-        if (resultSet != null && resultSet.next()) {
-            if (resultSet.getString("funcao").equals("AUTOR")) {
-                pessoa = new Autor(
-                        resultSet.getString("nome"),
-                        resultSet.getString("sobrenome"),
-                        resultSet.getString("email"),
-                        resultSet.getString("cpf"),
-                        Genero.valueOf(resultSet.getString("genero")),
-                        resultSet.getString("senha")
-                );
-                connection.close();
-                return pessoa;
-            } else if(resultSet.getString("funcao").equals("REVISOR")) {
-                pessoa = new Revisor(
-                        resultSet.getString("nome"),
-                        resultSet.getString("sobrenome"),
-                        resultSet.getString("email"),
-                        resultSet.getString("cpf"),
-                        Genero.valueOf(resultSet.getString("genero")),
-                        resultSet.getString("senha")
-                );
-                connection.close();
-                return pessoa;
-            } else {
-                pessoa = new Diretor(
-                        resultSet.getString("nome"),
-                        resultSet.getString("sobrenome"),
-                        resultSet.getString("email"),
-                        resultSet.getString("cpf"),
-                        Genero.valueOf(resultSet.getString("genero")),
-                        resultSet.getString("senha")
-                );
-                connection.close();
-                return pessoa;
+        try(PreparedStatement prtm = conn.prepareStatement(sql)){
+            prtm.setString(1, email);
+            try (ResultSet resultSet = prtm.executeQuery()){
+                if(resultSet.next()){
+                    return extrairObjeto(resultSet);
+                }
+            } catch (Exception e){
+                throw new RuntimeException("Erro na execução do comando SQL");
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL");
         }
-        connection.close();
+
         throw new RuntimeException("E-mail não encontrado!");
     }
 
@@ -110,5 +86,21 @@ public class PessoaDAO {
             return "DIRETOR";
         else
             throw new RuntimeException("Função não encontrada!");
+    }
+
+    private Pessoa extrairObjeto(ResultSet resultSet){
+        try{
+            return new PessoaFactory().getPessoa(
+                    resultSet.getString("nome"),
+                    resultSet.getString("sobrenome"),
+                    resultSet.getString("email"),
+                    resultSet.getString("cpf"),
+                    resultSet.getString("genero"),
+                    resultSet.getString("senha"),
+                    resultSet.getString("funcao")
+            );
+        } catch (Exception e){
+            throw new RuntimeException("Erro na extração do objeto");
+        }
     }
 }
