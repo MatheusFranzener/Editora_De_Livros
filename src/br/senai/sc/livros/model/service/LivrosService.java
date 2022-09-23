@@ -29,11 +29,7 @@ public class LivrosService {
     }
 
     public void atualizar(int isbn, Livros livroAtualizado) {
-        try {
-            acesso.atualizar(isbn, livroAtualizado);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        new LivrosDAO().atualizar(isbn, livroAtualizado);
     }
 
     public Collection<Livros> selecionarPorAutor(Pessoa pessoa) {

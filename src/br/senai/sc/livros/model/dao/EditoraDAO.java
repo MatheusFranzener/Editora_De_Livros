@@ -2,11 +2,9 @@ package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.Editora;
 import br.senai.sc.livros.model.factory.ConexaoFactory;
+import br.senai.sc.livros.model.factory.EditoraFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class EditoraDAO {
@@ -24,26 +22,38 @@ public class EditoraDAO {
 //        return listaEditoras;
 //    }
 
+    private Connection conn;
+
+    public EditoraDAO() {
+        this.conn = new ConexaoFactory().conectaBD();
+    }
+
     public ArrayList<Editora> getListaEditora() throws SQLException {
         ArrayList<Editora> contatoCollection = new ArrayList<>();
         String sql = "select * from editora";
 
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-
-        while (resultSet != null && resultSet.next()) {
-            Editora contato = new Editora(
-                    resultSet.getString("nome")
-            );
-
-            contatoCollection.add(contato);
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                while (resultSet != null && resultSet.next()) {
+                    contatoCollection.add(extrairObjeto(resultSet));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (SELECIONAR TODOS)");
         }
-        connection.close();
 
         return contatoCollection;
+    }
+
+    private Editora extrairObjeto(ResultSet resultSet) {
+        try {
+            return new EditoraFactory().getEditora(
+                    resultSet.getString("nome")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao extrair objeto");
+        }
     }
 }

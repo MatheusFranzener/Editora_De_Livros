@@ -94,15 +94,16 @@ public class LivrosDAO {
             try {
                 pstm.execute();
             } catch (SQLException e) {
-                System.out.println("Erro na execução do comando SQL");
+                throw new RuntimeException("Erro na execução do comando SQL");
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro na preparação do comando SQL");
         }
     }
 
-    public void atualizar(int isbn, Livros livroAtualizado) throws SQLException {
+    public void atualizar(int isbn, Livros livroAtualizado){
         String sql = "";
+
         if (livroAtualizado.getEditora() == null) {
             sql = "update livro set isbn = ?, titulo = ?, qtdPaginas = ?, status = ?, pessoa_cpf = ? where isbn = ?";
         } else {
@@ -126,7 +127,7 @@ public class LivrosDAO {
             } catch (SQLException e) {
                 throw new RuntimeException("Erro na execução do comando SQL");
             }
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Erro na preparação do comando SQL");
         }
     }
