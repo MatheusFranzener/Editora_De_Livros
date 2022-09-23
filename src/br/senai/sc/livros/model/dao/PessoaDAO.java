@@ -77,6 +77,25 @@ public class PessoaDAO {
         throw new RuntimeException("E-mail não encontrado!");
     }
 
+    public Autor buscarAutorCPF(String cpf){
+        String sql = "select * from pessoa where cpf = ?";
+
+        try(PreparedStatement prtm = conn.prepareStatement(sql)){
+            prtm.setString(1, cpf);
+            try (ResultSet resultSet = prtm.executeQuery()){
+                if(resultSet.next()){
+                    return (Autor) extrairObjeto(resultSet);
+                }
+            } catch (Exception e){
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL");
+        }
+
+        throw new RuntimeException("Cpf não encontrado!");
+    }
+
     public String buscarFuncao(Pessoa pessoa) {
         if (pessoa instanceof Autor)
             return "AUTOR";

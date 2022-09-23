@@ -13,11 +13,7 @@ public class LivrosService {
     LivrosDAO acesso = new LivrosDAO();
 
     public void inserir(Livros livro) {
-        try {
-            acesso.inserir(livro);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        new LivrosDAO().inserir(livro);
     }
 
     public Collection<Livros> selecionarTodos() {
@@ -29,11 +25,7 @@ public class LivrosService {
     }
 
     public Livros selecionar(int isbn) {
-        try {
-            return acesso.selecionar(isbn);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        return new LivrosDAO().selecionar(isbn);
     }
 
     public void atualizar(int isbn, Livros livroAtualizado) {
@@ -45,26 +37,15 @@ public class LivrosService {
     }
 
     public Collection<Livros> selecionarPorAutor(Pessoa pessoa) {
-        try {
-            return acesso.selecionarPorAutor(pessoa);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        String cpf = pessoa.getCpf();
+        return new LivrosDAO().selecionarPorAutor(cpf);
     }
 
     public Collection<Livros> selecionarAtividadesAutor(Pessoa pessoa) {
-        try {
-            return acesso.selecionarAtividadesAutor(pessoa);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        return new LivrosDAO().selecionarAtividadesAutor(pessoa);
     }
 
     public Collection<Livros> selecionarPorStatus(Status status) {
-        try {
-            return acesso.selecionarPorStatus(status);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        return new LivrosDAO().selecionarPorStatus(status);
     }
 }

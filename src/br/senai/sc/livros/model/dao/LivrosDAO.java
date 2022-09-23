@@ -2,6 +2,8 @@ package br.senai.sc.livros.model.dao;
 
 import br.senai.sc.livros.model.entities.*;
 import br.senai.sc.livros.model.factory.ConexaoFactory;
+import br.senai.sc.livros.model.factory.LivroFactory;
+import br.senai.sc.livros.model.factory.PessoaFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -72,162 +74,31 @@ public class LivrosDAO {
 //        }
 //    }
 
-    public void inserir(Livros livro) throws SQLException {
+    private Connection conn;
+    static PessoaDAO dao = new PessoaDAO();
+
+    public LivrosDAO() {
+        this.conn = new ConexaoFactory().conectaBD();
+    }
+
+    public void inserir(Livros livro) {
         String sql = "insert into livro (isbn, titulo, qtdPaginas, status, pessoa_cpf) values (?, ?, ?, ?, ?)";
         String cpf = livro.getAutor().getCpf();
-        ConexaoFactory conexao = new ConexaoFactory();
 
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, livro.getIsbn());
-        statement.setString(2, livro.getTitulo());
-        statement.setInt(3, livro.getQtdPag());
-        statement.setString(4, livro.getStatus().toString());
-        statement.setString(5, cpf);
-
-        statement.execute();
-        connection.close();
-    }
-
-    public Collection<Livros> selecionarTodos() throws SQLException {
-        Collection<Livros> livrosCollection = new ArrayList<>();
-        String sql = "select * from livro";
-
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-
-        while (resultSet != null && resultSet.next()) {
-            Livros livro = new Livros(
-                    resultSet.getString("titulo"),
-                    resultSet.getInt("isbn"),
-                    resultSet.getInt("qtdPaginas"),
-                    buscarAutorCPF(resultSet.getString("pessoa_cpf")),
-                    Status.valueOf(resultSet.getString("status"))
-            );
-
-            livrosCollection.add(livro);
-        }
-        connection.close();
-
-        return livrosCollection;
-    }
-
-    public Collection<Livros> selecionarPorAutor(Pessoa pessoa) throws SQLException {
-        Collection<Livros> livrosCollection = new ArrayList<>();
-        String sql = "select * from livro where pessoa_cpf = ?";
-
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, pessoa.getCpf());
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet != null && resultSet.next()) {
-            Livros livro = new Livros(
-                    resultSet.getString("titulo"),
-                    resultSet.getInt("isbn"),
-                    resultSet.getInt("qtdPaginas"),
-                    buscarAutorCPF(resultSet.getString("pessoa_cpf")),
-                    Status.valueOf(resultSet.getString("status"))
-            );
-
-            livrosCollection.add(livro);
-        }
-        connection.close();
-
-        return livrosCollection;
-    }
-
-    public Collection<Livros> selecionarAtividadesAutor(Pessoa pessoa) throws SQLException {
-        Collection<Livros> livrosCollection = new ArrayList<>();
-        String sql = "select * from livro where status = ? and pessoa_cpf = ?";
-
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, Status.AGUARDANDO_EDICAO.toString());
-        statement.setString(2, pessoa.getCpf());
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet != null && resultSet.next()) {
-            Livros livro = new Livros(
-                    resultSet.getString("titulo"),
-                    resultSet.getInt("isbn"),
-                    resultSet.getInt("qtdPaginas"),
-                    buscarAutorCPF(resultSet.getString("pessoa_cpf")),
-                    Status.valueOf(resultSet.getString("status"))
-            );
-
-            livrosCollection.add(livro);
-        }
-        connection.close();
-
-        return livrosCollection;
-    }
-
-    public Collection<Livros> selecionarPorStatus(Status status) throws SQLException {
-        Collection<Livros> livrosCollection = new ArrayList<>();
-        String sql = "select * from livro where status = ?";
-
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, status.toString());
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet != null && resultSet.next()) {
-            Livros livro = new Livros(
-                    resultSet.getString("titulo"),
-                    resultSet.getInt("isbn"),
-                    resultSet.getInt("qtdPaginas"),
-                    buscarAutorCPF(resultSet.getString("pessoa_cpf")),
-                    Status.valueOf(resultSet.getString("status"))
-            );
-
-            livrosCollection.add(livro);
-        }
-        connection.close();
-
-        return livrosCollection;
-    }
-
-    public Livros selecionar(int isbn) throws SQLException {
-        String sql = "select * from livro where isbn = ?";
-
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, isbn);
-        ResultSet resultSet = statement.executeQuery();
-
-        Livros livro;
-        if (resultSet != null) {
-            if (resultSet.next()) {
-                livro = new Livros(
-                        resultSet.getString("titulo"),
-                        resultSet.getInt("isbn"),
-                        resultSet.getInt("qtdPaginas"),
-                        buscarAutorCPF(resultSet.getString("pessoa_cpf")),
-                        Status.valueOf(resultSet.getString("status"))
-                );
-                return livro;
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            pstm.setInt(1, livro.getIsbn());
+            pstm.setString(2, livro.getTitulo());
+            pstm.setInt(3, livro.getQtdPag());
+            pstm.setString(4, livro.getStatus().toString());
+            pstm.setString(5, cpf);
+            try {
+                pstm.execute();
+            } catch (SQLException e) {
+                System.out.println("Erro na execução do comando SQL");
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL");
         }
-        connection.close();
-        throw new RuntimeException("Deu ruim!");
     }
 
     public void atualizar(int isbn, Livros livroAtualizado) throws SQLException {
@@ -238,54 +109,129 @@ public class LivrosDAO {
             sql = "update livro set isbn = ?, titulo = ?, qtdPaginas = ?, status = ?, pessoa_cpf = ?, editora_id = ? where isbn = ?";
         }
 
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, livroAtualizado.getIsbn());
-        statement.setString(2, livroAtualizado.getTitulo());
-        statement.setInt(3, livroAtualizado.getQtdPag());
-        statement.setString(4, livroAtualizado.getStatus().toString());
-        statement.setString(5, livroAtualizado.getAutor().getCpf());
-        if (livroAtualizado.getEditora() != null) {
-            statement.setInt(6, getEditoraID(livroAtualizado.getEditora().getNome()));
-            statement.setInt(7, isbn);
-        } else {
-            statement.setInt(6, isbn);
+        try (PreparedStatement pstm = conn.prepareStatement(sql)){
+            pstm.setInt(1, livroAtualizado.getIsbn());
+            pstm.setString(2, livroAtualizado.getTitulo());
+            pstm.setInt(3, livroAtualizado.getQtdPag());
+            pstm.setString(4, livroAtualizado.getStatus().toString());
+            pstm.setString(5, livroAtualizado.getAutor().getCpf());
+            if (livroAtualizado.getEditora() != null) {
+                pstm.setInt(6, getEditoraID(livroAtualizado.getEditora().getNome()));
+                pstm.setInt(7, isbn);
+            } else {
+                pstm.setInt(6, isbn);
+            }
+            try{
+                pstm.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Erro na preparação do comando SQL");
         }
-        statement.execute();
-
-        connection.close();
     }
 
-    public Autor buscarAutorCPF(String cpf) throws SQLException {
-        String sql = "select * from pessoa where cpf = ?";
+    public Collection<Livros> selecionarTodos() {
+        Collection<Livros> livrosCollection = new ArrayList<>();
+        String sql = "select * from livro";
 
-        ConexaoFactory conexao = new ConexaoFactory();
-
-        Connection connection = conexao.conectaBD();
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, cpf);
-        ResultSet resultSet = statement.executeQuery();
-
-        Autor autor;
-        if (resultSet != null) {
-            if (resultSet.next()) {
-                autor = new Autor(
-                        resultSet.getString("nome"),
-                        resultSet.getString("sobrenome"),
-                        resultSet.getString("email"),
-                        resultSet.getString("cpf"),
-                        Genero.valueOf(resultSet.getString("genero")),
-                        resultSet.getString("senha")
-                );
-                return autor;
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                while (resultSet != null && resultSet.next()) {
+                    livrosCollection.add(extrairObjetoLivro(resultSet));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (SELECIONAR TODOS)");
         }
-        connection.close();
-        throw new RuntimeException("Deu ruim!");
+
+        return livrosCollection;
+    }
+
+    public Collection<Livros> selecionarPorAutor(String cpf) {
+        Collection<Livros> livrosCollection = new ArrayList<>();
+        String sql = "select * from livro where pessoa_cpf = ?";
+
+        System.out.println("Passou aqui 1");
+
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            System.out.println("Passou aqui 2");
+            prtm.setString(1, cpf);
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                System.out.println("Passou aqui 3");
+                while (resultSet.next()) {
+                    livrosCollection.add(extrairObjetoLivro(resultSet));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (SELECIONAR POR AUTOR)");
+        }
+
+        return livrosCollection;
+    }
+
+    public Collection<Livros> selecionarAtividadesAutor(Pessoa pessoa) {
+        Collection<Livros> livrosCollection = new ArrayList<>();
+        String sql = "select * from livro where status = ? and pessoa_cpf = ?";
+
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            prtm.setString(1, Status.AGUARDANDO_EDICAO.toString());
+            prtm.setString(2, pessoa.getCpf());
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                while (resultSet != null && resultSet.next()) {
+                    livrosCollection.add(extrairObjetoLivro(resultSet));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (SELECIONAR ATIVIDADES AUTOR)");
+        }
+
+        return livrosCollection;
+    }
+
+    public Collection<Livros> selecionarPorStatus(Status status) {
+        Collection<Livros> livrosCollection = new ArrayList<>();
+        String sql = "select * from livro where status = ?";
+
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            prtm.setString(1, status.toString());
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                while (resultSet != null && resultSet.next()) {
+                    livrosCollection.add(extrairObjetoLivro(resultSet));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro na preparação do comando SQL (SELECIONAR STATUS)");
+        }
+
+        return livrosCollection;
+    }
+
+    public Livros selecionar(int isbn) {
+        String sql = "select * from livro where isbn = ?";
+
+        try (PreparedStatement prtm = conn.prepareStatement(sql)) {
+            prtm.setInt(1, isbn);
+            try (ResultSet resultSet = prtm.executeQuery()) {
+                if (resultSet.next()) {
+                    return extrairObjetoLivro(resultSet);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro na execução do comando SQL");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro na preparação do comando SQL (SELECIONAR POR ISBN)");
+        }
+
+        throw new RuntimeException("Algo deu ruim!");
     }
 
     public Integer getEditoraID(String editoraNome) throws SQLException {
@@ -305,5 +251,19 @@ public class LivrosDAO {
             }
         }
         throw new RuntimeException("Editora não encontrada!");
+    }
+
+    private Livros extrairObjetoLivro(ResultSet resultSet) {
+        try {
+            return new LivroFactory().getLivro(
+                    resultSet.getString("titulo"),
+                    resultSet.getInt("isbn"),
+                    resultSet.getInt("qtdPaginas"),
+                    dao.buscarAutorCPF(resultSet.getString("pessoa_cpf")),
+                    resultSet.getString("status")
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao extrair objeto");
+        }
     }
 }
